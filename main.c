@@ -118,7 +118,7 @@ int binsearch(char *word, const char *str[], int n)
 /* exists: wrapper function for binsearch that returns true if found instead of location */
 static inline int exists(char *word, const char *wlist[], int len)
 {
-	return binsearch(word, wlist, len) < -1 ? 0 : 1;
+	return binsearch(word, wlist, len) == -1 ? 0 : 1;
 }
 
 /* addgnode: add (if not already present) the group part of variable */
