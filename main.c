@@ -88,12 +88,6 @@ int main(void)
 	printf("\nKeywords Found:\n");
 	printtree(root);
 
-	/* TODO: PRINT PAGE NUMBERS HERE
-	printf("\nKeywords Found:\n");
-	for(n = 0; n < NKEYS; n++)
-		if(keytab[n].count > 0)
-			printf("%4d %s\n", keytab[n].count, keytab[n].word);*/
-
 	return EXIT_SUCCESS;
 }
 
