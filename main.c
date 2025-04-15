@@ -197,10 +197,10 @@ void printtree(struct gnode *p)
 		if(p->root == NULL)
 		{
 			printf(p->var_beg);
-			printf("\n");
 		}
 		else
 			printetree(p->root, p->var_beg);
+			//printf("\n");
 		printtree(p->right);
 	}
 }
