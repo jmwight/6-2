@@ -149,7 +149,7 @@ struct gnode *addgnode(char *word, struct gnode *p, int grpsz)
 		else
 			p->root = addenode(word+grpsz, p->root);
 	}
-	else if(comp = strncmp(word, p->var_beg, grpsz) == 0)
+	else if((comp = strncmp(word, p->var_beg, grpsz)) == 0)
 	{
 		if(strlen(word) > grpsz)
 			p->root = addenode(word+grpsz, p->root);
