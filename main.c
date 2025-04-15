@@ -41,24 +41,14 @@ const char *datatypes[] =
 int binsearch(char *, const char **, int);
 static inline int exists(char *, const char **, int);
 struct gnode *addgnode(char *, struct gnode *, int);
-struct enode *addenode(char *, struct enode *);
 void printtree(struct gnode *);
 
 /* node for tree of groups (i.e. x first letter of words) */
 struct gnode
 {
-	char *var_beg;
-	struct enode *root;
+	char *group;
 	struct gnode *left;
 	struct gnode *right;
-};
-
-/* struct for ends of variables in same group */
-struct enode
-{
-	char *var_end;
-	struct enode *left;
-	struct enode *right;
 };
 
 int main(int argc, char **argv)
@@ -87,8 +77,8 @@ int main(int argc, char **argv)
 				continue;
 			}
 		}
-		else if((isalpha(word[0]) || word[0] == '_' || word[0] == '#') && !wattr.str && !wattr.comm)
-			if(exists(word, datatypes, NKEYS))
+		else if((isalpha(word[0]) || word[0] == '_' || word[0] == '#') && !wattr.str && !wattr.comm)	
+			if(exists(word, datatypes, NKEYS)) /* TODO: ADD PROVISION FOR STRUCTS (SKIP ONE EXTRA WORD ) */
 				datatype = 1;
 	printf("\nKeywords Found:\n");
 	printtree(root);
@@ -132,92 +122,30 @@ struct gnode *addgnode(char *word, struct gnode *p, int grpsz)
 	if(p == NULL)
 	{
 		p = malloc(sizeof(struct gnode));
-		p->var_beg = strndup(word, grpsz); /* plus 1 because of '\0' */
-		if(p->var_beg == NULL)
+		p->group = strndup(word, grpsz); /* plus 1 because of '\0' */
+		if(p->group == NULL)
 		{
 			printf("Error: out of memory");
 			return NULL;
 		}
-		p->var_beg[grpsz] = '\0';
 		p->left = NULL;
 		p->right = NULL;
-
-		/* no need to add ending part to tree word is size or less than grpsz */
-		if(strlen(word) <= grpsz)
-			p->root = NULL;
-		/* add ending part of word to ending part tree */
-		else
-			p->root = addenode(word+grpsz, p->root);
 	}
-	else if((comp = strncmp(word, p->var_beg, grpsz)) == 0)
-	{
-		if(strlen(word) > grpsz)
-			p->root = addenode(word+grpsz, p->root);
-	}
-	else if(comp < 0)
+	else if((comp = strncmp(word, p->group, grpsz)) < 0)
 		p->left = addgnode(word, p->left, grpsz);
-	else
+	else if(comp > 0)
 		p->right = addgnode(word, p->right, grpsz);
 
 	return p;
 }
 
-/* enode: add ending part (if not already present) or variable name */
-struct enode *addenode(char *end, struct enode *p)
-{
-	int comp;
-
-	if(p == NULL)
-	{
-		p = malloc(sizeof(struct enode));
-		p->var_end = strdup(end); /* plus 1 because of '\0' */
-		if(p->var_end == NULL)
-		{
-			printf("Error: out of memory");
-			return NULL;
-		}
-		p->left = NULL;
-		p->right = NULL;
-
-	}
-	else if((comp = strcmp(end, p->var_end)) < 0)
-		p->left = addenode(end, p->left);
-	else if(comp > 0)
-		p->right = addenode(end, p->right);
-
-	return p;
-
-}
-
 /* printtree: */
 void printtree(struct gnode *p)
 {
-	void printetree(struct enode*, char*); /* internal function declaration */
 	if(p != NULL)
 	{
 		printtree(p->left);
-		/* this first x characters maybe there was nothing after it just the group 
-		 * i.e. group is 5 characters. Variable name is just n. Nothing to overflow 
-		 * into end variable group */
-		if(p->root == NULL)
-		{
-			printf(p->var_beg);
-			printf("\n");
-		}
-		else
-			printetree(p->root, p->var_beg);
-			//printf("\n");
+		printf("%s\n", p->group);
 		printtree(p->right);
-	}
-}
-
-/* printetree: internally used function by printtree to get ending parts from groups */
-void printetree(struct enode *p, char *var_beg)
-{
-	if(p != NULL)
-	{
-		printetree(p->left, var_beg);
-		printf("%s%s\n", var_beg, p->var_end);
-		printetree(p->right, var_beg);
 	}
 }
