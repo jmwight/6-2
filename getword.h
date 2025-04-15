@@ -3,7 +3,7 @@
 
 struct attr
 {
-	int comm, str, c;
+	int comm, str, c, func;
 };
 
 struct attr getword(char *word, int lim);

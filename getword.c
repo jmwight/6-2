@@ -14,7 +14,7 @@ struct attr getword(char *word, int lim)
 	void ungetch(int);   //try this later & remove getch.h header for learning	
 
 	char *w = word;
-	onelncom = multilncom = 0;
+	wattr.func = 0;
 
 	while(isspace(c = getch()))
 		if(c == '\n')
@@ -66,6 +66,13 @@ struct attr getword(char *word, int lim)
 				if(firstch)
 					firstch = 0;
 				break;
+			case '(':
+				wattr.func = 1;
+				/* zoom forward */
+				/*while(!isspace(c = getch()))
+					;
+				ungetch(c);*/
+				return wattr;
 			default:
 				*w = c;
 				if(firstch && !isalpha(*w) || !firstch && !isalnum(*w))
