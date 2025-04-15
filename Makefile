@@ -2,7 +2,7 @@ ARGS = -g3
 OBJ = main.o getch.o getword.o
 
 6-2: $(OBJ)
-	cc $(ARGS) -o keyword-counter $(OBJ)
+	cc $(ARGS) -o 6-2 $(OBJ)
 
 main.o: main.c getword.h
 	cc $(ARGS) -c main.c
@@ -15,4 +15,4 @@ getch.o: getch.c
 
 .PHONY: clean
 clean:
-	rm -rf $(ARGS) 6-2
+	rm -rf $(OBJ) 6-2

@@ -9,30 +9,31 @@
 /* most of with some of the keyword types, not all and an int to store count */
 const char *datatypes[] = 
 {
-	"int8_t",
-	"int16_t",
-	"int32_t",
-	"int64_t",
-	"uint8_t", 
-	"uint16_t",
-	"uint32_t",
-	"uint64_t",
+	"_BitInt", /*ANOTHER TRICKY ONE IT'S FORMAT LIKE _BitInt(32) SO WE NEED TO WORRY ABOUT () 
+		       *MIGHT SKIP FOR SIMPLICITY */
+
+	"_Bool",
+	"_Complex",
+	"_Decimal128",
+	"_Decimal32",
+	"_Decimal64",
 	"bool",
 	"char",
 	"double",
 	"float",
 	"int",
+	"int16_t",
+	"int32_t",
+	"int64_t",
+	"int8_t",
 	"long",
 	"short",
 	"struct", //WARNUNG, WHAT ARE WE GONNA DO ABOUT THESE?? 
+	"uint16_t",
+	"uint32_t",
+	"uint64_t",
+	"uint8_t",
 	"void", //ALSO TRICKY WHAT ABOUT FUNCTION RETURNS I JUST THROUGHT OF THIS!!
-	"_BitInt", /*ANOTHER TRICKY ONE IT'S FORMAT LIKE _BitInt(32) SO WE NEED TO WORRY ABOUT () 
-		       *MIGHT SKIP FOR SIMPLICITY */
-	"_Bool",
-	"_Complex",
-	"_Decimal128",
-	"_Decimal32",
-	"_Decimal64"
 };
 
 #define NKEYS	sizeof datatypes / sizeof(char*)
@@ -41,7 +42,7 @@ int binsearch(char *, const char **, int);
 static inline int exists(char *, const char **, int);
 struct gnode *addgnode(char *, struct gnode *, int);
 struct enode *addenode(char *, struct enode *);
-
+void printtree(struct gnode *);
 
 /* node for tree of groups (i.e. x first letter of words) */
 struct gnode
@@ -71,6 +72,7 @@ int main(void)
 
 	while((wattr = getword(word, MAXWORD)).c != EOF)
 		if(datatype)
+		{
 			if((isalpha(word[0]) || word[0] == '_') && !wattr.str && !wattr.comm)
 			{
 				root = addgnode(word, root, grpsz);
@@ -79,10 +81,12 @@ int main(void)
 				datatype = 0;
 				continue;
 			}
+		}
 		else if((isalpha(word[0]) || word[0] == '_' || word[0] == '#') && !wattr.str && !wattr.comm)
 			if(exists(word, datatypes, NKEYS))
 				datatype = 1;
 	printf("\nKeywords Found:\n");
+	printtree(root);
 
 	/* TODO: PRINT PAGE NUMBERS HERE
 	printf("\nKeywords Found:\n");
@@ -129,7 +133,7 @@ struct gnode *addgnode(char *word, struct gnode *p, int grpsz)
 	if(p == NULL)
 	{
 		p = malloc(sizeof(struct gnode));
-		p->var_beg = strndup(word, grpsz+1); /* plus 1 because of '\0' */
+		p->var_beg = strndup(word, grpsz); /* plus 1 because of '\0' */
 		if(p->var_beg == NULL)
 		{
 			printf("Error: out of memory");
@@ -152,13 +156,9 @@ struct gnode *addgnode(char *word, struct gnode *p, int grpsz)
 			p->root = addenode(word+grpsz, p->root);
 	}
 	else if(comp < 0)
-	{
 		p->left = addgnode(word, p->left, grpsz);
-	}
 	else
-	{
 		p->right = addgnode(word, p->right, grpsz);
-	}
 
 	return p;
 }
@@ -181,15 +181,43 @@ struct enode *addenode(char *end, struct enode *p)
 		p->right = NULL;
 
 	}
-	else if(comp < 0)
-	{
+	else if((comp = strcmp(end, p->var_end)) < 0)
 		p->left = addenode(end, p->left);
-	}
 	else if(comp > 0)
-	{
 		p->right = addenode(end, p->right);
-	}
 
 	return p;
 
+}
+
+/* printtree: */
+void printtree(struct gnode *p)
+{
+	void printetree(struct enode*, char*); /* internal function declaration */
+	if(p != NULL)
+	{
+		printtree(p->left);
+		/* this first x characters maybe there was nothing after it just the group 
+		 * i.e. group is 5 characters. Variable name is just n. Nothing to overflow 
+		 * into end variable group */
+		if(p->root == NULL)
+		{
+			printf(p->var_beg);
+			printf("\n");
+		}
+		else
+			printetree(p->root, p->var_beg);
+		printtree(p->right);
+	}
+}
+
+/* printetree: internally used function by printtree to get ending parts from groups */
+void printetree(struct enode *p, char *var_beg)
+{
+	if(p != NULL)
+	{
+		printetree(p->left, var_beg);
+		printf("%s%s\n", var_beg, p->var_end);
+		printetree(p->right, var_beg);
+	}
 }
