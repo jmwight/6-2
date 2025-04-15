@@ -61,13 +61,18 @@ struct enode
 	struct enode *right;
 };
 
-int main(void)
+int main(int argc, char **argv)
 {
+	if(argc > 2)
+		printf("Usage: ./6-2 [groupsize]\n");
 	int n, datatype, grpsz;
 	char word[MAXWORD];
 	struct attr wattr;
 	datatype = 0;
-	grpsz = 6; /* TODO: get as input from user with int argc, char **argv */
+	if(argc == 2)
+		grpsz = atoi(argv[1]);
+	else
+		grpsz = 6;
 	struct gnode *root = NULL;
 
 	while((wattr = getword(word, MAXWORD)).c != EOF)
@@ -197,6 +202,7 @@ void printtree(struct gnode *p)
 		if(p->root == NULL)
 		{
 			printf(p->var_beg);
+			printf("\n");
 		}
 		else
 			printetree(p->root, p->var_beg);
