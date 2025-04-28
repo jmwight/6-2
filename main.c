@@ -68,7 +68,8 @@ int main(int argc, char **argv)
 	while((wattr = getword(word, MAXWORD)).c != EOF)
 		if(datatype)
 		{
-			if((isalpha(word[0]) || word[0] == '_') && !wattr.str && !wattr.comm && !wattr.func)
+			if((isalpha(word[0]) || word[0] == '_') && !wattr.str && !wattr.comm && 
+					!wattr.func)
 			{
 				root = addgnode(word, root, grpsz);
 				if(root == NULL) /* error indicated by the system */
@@ -76,8 +77,10 @@ int main(int argc, char **argv)
 			}
 			datatype = 0;
 		}
-		else if((isalpha(word[0]) || word[0] == '_' || word[0] == '#') && !wattr.str && !wattr.comm)	
-			if(exists(word, datatypes, NKEYS)) /* TODO: ADD PROVISION FOR STRUCTS (SKIP ONE EXTRA WORD ) */
+		else if((isalpha(word[0]) || word[0] == '_' || word[0] == '#') && !wattr.str &&
+			       !wattr.comm)	
+			if(exists(word, datatypes, NKEYS)) /* TODO: ADD PROVISION FOR STRUCTS 
+							      (SKIP ONE EXTRA WORD ) */
 				datatype = 1;
 	printf("\nKeywords Found:\n");
 	printtree(root);
