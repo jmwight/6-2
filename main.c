@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 			if(exists(word, datatypes, NKEYS)) /* TODO: ADD PROVISION FOR STRUCTS 
 							      (SKIP ONE EXTRA WORD ) */
 				datatype = 1;
-	printf("\nKeywords Found:\n");
+	printf("\nVariables Found:\n");
 	printtree(root);
 
 	return EXIT_SUCCESS;
